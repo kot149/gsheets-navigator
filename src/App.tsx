@@ -268,11 +268,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-      <div className="text-center">
+      <div className="text-center space-y-2">
         <p className="text-gray-600 dark:text-gray-300 text-lg">
           Press Ctrl + Space to show sheet list
         </p>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
           Use this on Google Sheets page
         </p>
       </div>
@@ -283,13 +283,13 @@ function App() {
           onClick={handleDialogBackgroundClick}
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6 max-h-[80vh] overflow-auto"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6 max-h-[80vh] overflow-auto space-y-4"
             onClick={(e) => e.stopPropagation()}
             onMouseDown={handleDialogMouseDown}
             onMouseMove={handleDialogMouseMove}
             onMouseUp={handleDialogMouseUp}
           >
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center">
               <button
                 onClick={handleScanPage}
                 disabled={isScanning}
@@ -323,21 +323,19 @@ function App() {
               </button>
             </div>
 
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Search sheets..."
-                value={searchKeyword}
-                onChange={handleKeywordChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                autoFocus
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Search sheets..."
+              value={searchKeyword}
+              onChange={handleKeywordChange}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              autoFocus
+            />
 
-            <div className="mb-4">
+            <div>
               {filteredSheets.length === 0 ? (
                 <div className="text-center py-8">
-                  <div className="text-gray-500 dark:text-gray-400 mb-2">
+                  <div className="text-gray-500 dark:text-gray-400">
                     {sheets.length === 0 ? 'No sheets found' : 'No matching sheets'}
                   </div>
                 </div>
