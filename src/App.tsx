@@ -9,6 +9,8 @@ function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [sheets, setSheets] = useState<SheetInfo[]>([]);
   const [isScanning, setIsScanning] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const extractSheetsFromCurrentPage = (): SheetInfo[] => {
     try {
@@ -171,6 +173,32 @@ function App() {
     }
   };
 
+  const filteredSheets = sheets.filter(sheet =>
+    sheet.name.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
+
+  const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(e.target.value);
+    setSelectedIndex(0);
+  };
+
+  const handleKeyNavigation = (event: KeyboardEvent) => {
+    if (!isDialogOpen) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setSelectedIndex(prev => Math.min(prev + 1, filteredSheets.length - 1));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setSelectedIndex(prev => Math.max(prev - 1, 0));
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      if (filteredSheets[selectedIndex]) {
+        handleSheetClick(filteredSheets[selectedIndex]);
+      }
+    }
+  };
+
   useEffect(() => {
     handleScanPage();
   }, []);
@@ -180,6 +208,8 @@ function App() {
       if (event.ctrlKey && event.code === 'Space') {
         event.preventDefault();
         setIsDialogOpen(true);
+        setSearchKeyword('');
+        setSelectedIndex(0);
         handleScanPage();
       }
     };
@@ -192,12 +222,20 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keydown', handleKeyDownEscape);
+    window.addEventListener('keydown', handleKeyNavigation);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keydown', handleKeyDownEscape);
+      window.removeEventListener('keydown', handleKeyNavigation);
     };
-  }, []);
+  }, [isDialogOpen, filteredSheets, selectedIndex]);
+
+  useEffect(() => {
+    if (selectedIndex >= filteredSheets.length && filteredSheets.length > 0) {
+      setSelectedIndex(filteredSheets.length - 1);
+    }
+  }, [filteredSheets.length, selectedIndex]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
@@ -257,25 +295,44 @@ function App() {
             </div>
 
             <div className="mb-4">
-              {sheets.length === 0 ? (
+              <input
+                type="text"
+                placeholder="Search sheets..."
+                value={searchKeyword}
+                onChange={handleKeywordChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                autoFocus
+              />
+            </div>
+
+            <div className="mb-4">
+              {filteredSheets.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-gray-500 dark:text-gray-400 mb-2">
-                    No sheets found
+                    {sheets.length === 0 ? 'No sheets found' : 'No matching sheets'}
                   </div>
                   <div className="text-sm text-gray-400 dark:text-gray-500">
-                    Please run on Google Sheets page
+                    {sheets.length === 0 ? 'Please run on Google Sheets page' : 'Try different keywords'}
                   </div>
                 </div>
               ) : (
                 <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {sheets.map((sheet, index) => (
+                  {filteredSheets.map((sheet, index) => (
                     <div
                       key={sheet.id}
                       onClick={() => handleSheetClick(sheet)}
-                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors duration-200"
+                      className={`flex items-center justify-between p-2 rounded border-2 cursor-pointer transition-colors duration-200 ${
+                        index === selectedIndex
+                          ? 'bg-blue-100 dark:bg-blue-900/50 border-blue-500'
+                          : 'bg-gray-50 dark:bg-gray-700 border-transparent hover:bg-gray-100 dark:hover:bg-gray-600'
+                      }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <span className="font-medium text-gray-900 dark:text-white">
+                        <span className={`font-medium ${
+                          index === selectedIndex
+                            ? 'text-blue-900 dark:text-blue-100'
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
                           {sheet.name}
                         </span>
                       </div>
@@ -283,15 +340,6 @@ function App() {
                   ))}
                 </div>
               )}
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setIsDialogOpen(false)}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200"
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>
