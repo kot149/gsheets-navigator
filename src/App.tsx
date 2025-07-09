@@ -259,17 +259,6 @@ function App() {
           >
             <div className="flex justify-between items-center mb-4">
               <button
-                onClick={() => setIsDialogOpen(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 ml-auto"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="mb-6">
-              <button
                 onClick={handleScanPage}
                 disabled={isScanning}
                 className={`px-3 py-2 rounded text-sm transition-colors duration-200 flex items-center justify-center space-x-2 ${
@@ -292,6 +281,14 @@ function App() {
                   </>
                 )}
               </button>
+              <button
+                onClick={() => setIsDialogOpen(false)}
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700 rounded-lg p-1 transition-colors duration-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
             <div className="mb-4">
@@ -310,9 +307,6 @@ function App() {
                 <div className="text-center py-8">
                   <div className="text-gray-500 dark:text-gray-400 mb-2">
                     {sheets.length === 0 ? 'No sheets found' : 'No matching sheets'}
-                  </div>
-                  <div className="text-sm text-gray-400 dark:text-gray-500">
-                    {sheets.length === 0 ? 'Please run on Google Sheets page' : 'Try different keywords'}
                   </div>
                 </div>
               ) : (
