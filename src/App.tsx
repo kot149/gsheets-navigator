@@ -50,16 +50,7 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-      <div className="text-center space-y-2">
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
-          Press Ctrl + Space to show sheet list
-        </p>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">
-          Use this on Google Sheets page
-        </p>
-      </div>
-
+    <div>
       <SheetNavigatorDialog
         isOpen={isDialogOpen}
         sheets={filteredSheets}
