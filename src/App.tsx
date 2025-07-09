@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface SheetInfo {
   id: string;
@@ -11,6 +11,8 @@ function App() {
   const [isScanning, setIsScanning] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const isDraggingRef = useRef(false);
+  const mouseDownPosRef = useRef<{ x: number; y: number } | null>(null);
 
   const extractSheetsFromCurrentPage = (): SheetInfo[] => {
     try {
@@ -199,6 +201,33 @@ function App() {
     }
   };
 
+  const handleDialogBackgroundClick = () => {
+    if (!isDraggingRef.current) {
+      setIsDialogOpen(false);
+    }
+    isDraggingRef.current = false;
+    mouseDownPosRef.current = null;
+  };
+
+  const handleDialogMouseDown = (e: React.MouseEvent) => {
+    isDraggingRef.current = false;
+    mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleDialogMouseMove = (e: React.MouseEvent) => {
+    if (mouseDownPosRef.current) {
+      const deltaX = Math.abs(e.clientX - mouseDownPosRef.current.x);
+      const deltaY = Math.abs(e.clientY - mouseDownPosRef.current.y);
+      if (deltaX > 5 || deltaY > 5) {
+        isDraggingRef.current = true;
+      }
+    }
+  };
+
+  const handleDialogMouseUp = () => {
+    mouseDownPosRef.current = null;
+  };
+
   useEffect(() => {
     handleScanPage();
   }, []);
@@ -251,11 +280,14 @@ function App() {
       {isDialogOpen && (
         <div
           className="fixed inset-0 bg-black/25 flex items-center justify-center z-50"
-          onClick={() => setIsDialogOpen(false)}
+          onClick={handleDialogBackgroundClick}
         >
           <div
             className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6 max-h-[80vh] overflow-auto"
             onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleDialogMouseDown}
+            onMouseMove={handleDialogMouseMove}
+            onMouseUp={handleDialogMouseUp}
           >
             <div className="flex justify-between items-center mb-4">
               <button
