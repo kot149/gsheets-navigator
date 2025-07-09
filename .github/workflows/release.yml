@@ -1,0 +1,70 @@
+name: Release UserScript
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build UserScript
+        run: bun run build
+
+      - name: Get version from tag or input
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "tag_name=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+            echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Find UserScript file
+        id: userscript
+        run: |
+          USERSCRIPT_FILE=$(find dist -name "*.user.js" | head -1)
+          if [ -z "$USERSCRIPT_FILE" ]; then
+            echo "Error: UserScript file not found in dist directory"
+            exit 1
+          fi
+          echo "file_path=$USERSCRIPT_FILE" >> $GITHUB_OUTPUT
+          echo "file_name=$(basename $USERSCRIPT_FILE)" >> $GITHUB_OUTPUT
+
+      - name: Update version in UserScript
+        run: |
+          sed -i "s/@version.*/@version      ${{ steps.version.outputs.version }}/" ${{ steps.userscript.outputs.file_path }}
+
+      - name: Create Release
+        run: |
+          gh release create ${{ steps.version.outputs.tag_name }} \
+            --title "${{ steps.version.outputs.version }}" \
+            --draft \
+            --generate-notes \
+            ${{ steps.userscript.outputs.file_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
