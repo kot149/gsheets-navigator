@@ -13,7 +13,7 @@ export default defineConfig({
       userscript: {
         author: "https://github.com/kot149",
         homepageURL: "https://github.com/kot149/gsheets-navigator",
-        downloadURL: "https://github.com/kot149/gsheets-navigator/releases/download/latest/gsheets-navigator.user.js",
+        downloadURL: "https://github.com/kot149/gsheets-navigator/releases/latest/download/gsheets-navigator.user.js",
         match: [ 'https://docs.google.com/spreadsheets/d/*' ],
       },
       build: {

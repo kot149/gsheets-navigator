@@ -9,7 +9,7 @@ A UserScript to add the feature to search and jump sheets in Google Sheets.
 1. Install [Tampermonkey](https://tampermonkey.net/)
 2. Install the UserScript:
    - [Download from Releases](https://github.com/kot149/gsheets-navigator/releases)
-   - Or [Direct Install](https://github.com/kot149/gsheets-navigator/releases/download/latest/gsheets-navigator.user.js)
+   - Or [Direct Install](https://github.com/kot149/gsheets-navigator/releases/latest/download/gsheets-navigator.user.js)
 
 ## Usage
 
