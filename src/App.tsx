@@ -12,20 +12,89 @@ function App() {
 
   const extractSheetsFromCurrentPage = (): SheetInfo[] => {
     try {
-      const sheetTabs = document.querySelectorAll('.docs-sheet-tab');
       const extractedSheets: SheetInfo[] = [];
 
-      sheetTabs.forEach((tab) => {
-        const id = tab.getAttribute('id');
-        const nameElement = tab.querySelector('.docs-sheet-tab-name');
-        const name = nameElement?.textContent?.trim();
+      // まず、現在のページのスクリプトからシート情報を抽出を試行
+      const scripts = document.querySelectorAll('script');
 
-        if (id && name) {
-          extractedSheets.push({ id, name });
+      for (const script of scripts) {
+        const text = script.textContent || '';
+
+        // Googleスプレッドシートの内部データ構造から抽出
+        // パターン1: [21350203, "[シート番号,0,\"gid\",[{\"1\":[[0,0,\"シート名\"]
+        const pattern1 = /\[21350203,\s*"\[(\d+),0,\\"(\d+)\\",\[{[^}]*\[\[0,0,\\"([^"\\]+)\\"/g;
+        let match1;
+        while ((match1 = pattern1.exec(text)) !== null) {
+          const gid = match1[2];
+          const name = match1[3];
+          if (gid && name && gid !== '0') {
+            extractedSheets.push({ id: gid, name });
+          }
         }
-      });
 
-      return extractedSheets;
+        // パターン2: より簡単なJSONパターン
+        const pattern2 = /"(\d{6,})"\s*,\s*\[{[^}]*\[\[0,0,\s*"([^"]+)"/g;
+        let match2;
+        while ((match2 = pattern2.exec(text)) !== null) {
+          const gid = match2[1];
+          const name = match2[2];
+          if (gid && name && gid !== '0' && name.length > 0) {
+            const existing = extractedSheets.find(s => s.id === gid);
+            if (!existing) {
+              extractedSheets.push({ id: gid, name });
+            }
+          }
+        }
+
+        // パターン3: gridIdフィールドから現在のアクティブなシートのgidを取得
+        const gridIdMatch = text.match(/"gridId"\s*:\s*(\d+)/);
+        if (gridIdMatch) {
+          const currentGid = gridIdMatch[1];
+          // 現在のアクティブなシートの名前をDOMから取得
+          const activeTab = document.querySelector('.docs-sheet-active-tab .docs-sheet-tab-name');
+          if (activeTab && currentGid !== '0') {
+            const activeName = activeTab.textContent?.trim();
+            if (activeName) {
+              const existing = extractedSheets.find(s => s.id === currentGid);
+              if (!existing) {
+                extractedSheets.push({ id: currentGid, name: activeName });
+              }
+            }
+          }
+        }
+      }
+
+      // フォールバック: DOM要素からシート名を取得
+      if (extractedSheets.length === 0) {
+        const sheetTabs = document.querySelectorAll('.docs-sheet-tab');
+        const currentGidMatch = window.location.hash.match(/gid=(\d+)/);
+        const currentGid = currentGidMatch ? currentGidMatch[1] : null;
+
+        sheetTabs.forEach((tab, index) => {
+          const nameElement = tab.querySelector('.docs-sheet-tab-name');
+          const name = nameElement?.textContent?.trim();
+
+          if (name) {
+            // アクティブなタブの場合は現在のgidを使用
+            const isActive = tab.classList.contains('docs-sheet-active-tab');
+            let gid: string;
+
+            if (isActive && currentGid) {
+              gid = currentGid;
+            } else {
+              // 他のシートの場合、推測されるgid（実際の値ではないが一意）
+              gid = `sheet_${index}_${name.replace(/[^a-zA-Z0-9]/g, '')}_${Date.now()}`;
+            }
+
+            extractedSheets.push({ id: gid, name });
+          }
+        });
+      }
+
+      // 重複を除去
+      return extractedSheets.filter((sheet, index, self) =>
+        index === self.findIndex(s => s.id === sheet.id)
+      );
     } catch (error) {
       console.error('ページの解析に失敗しました:', error);
       return [];
@@ -45,13 +114,60 @@ function App() {
   };
 
   const handleSheetClick = (sheet: SheetInfo) => {
-    const sheetElement = document.getElementById(sheet.id);
-    if (sheetElement) {
-      sheetElement.click();
-      setIsDialogOpen(false);
-    } else {
+    try {
+      // シートのgidが数値のみの場合（実際のgid）、リロードせずにURL変更
+      if (/^\d+$/.test(sheet.id)) {
+        const currentUrl = new URL(window.location.href);
+
+        // クエリパラメータにgidを設定
+        currentUrl.searchParams.set('gid', sheet.id);
+
+        // ハッシュにもgidを設定
+        currentUrl.hash = `gid=${sheet.id}`;
+
+        // history.pushStateを使ってリロードせずにURL変更
+        window.history.pushState({}, '', currentUrl.toString());
+
+        // ハッシュ変更イベントを手動でトリガー
+        window.dispatchEvent(new HashChangeEvent('hashchange', {
+          oldURL: window.location.href,
+          newURL: currentUrl.toString()
+        }));
+
+        // Googleスプレッドシートの内部処理をトリガーするために、
+        // 少し待ってからpopstateイベントも発火
+        setTimeout(() => {
+          window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
+        }, 100);
+
+        setIsDialogOpen(false);
+      } else {
+        // gidが推測値の場合、DOM要素をクリックを試行
+        const sheetTabs = document.querySelectorAll('.docs-sheet-tab');
+        let targetTab: Element | null = null;
+
+        sheetTabs.forEach((tab) => {
+          const nameElement = tab.querySelector('.docs-sheet-tab-name');
+          const name = nameElement?.textContent?.trim();
+          if (name === sheet.name) {
+            targetTab = tab;
+          }
+        });
+
+        if (targetTab) {
+          (targetTab as HTMLElement).click();
+          setIsDialogOpen(false);
+        } else {
+          // フォールバック: クリップボードにコピー
+          navigator.clipboard.writeText(`シート名: ${sheet.name}, ID: ${sheet.id}`);
+          alert(`シート情報をクリップボードにコピーしました:\n${sheet.name}\n\n手動でシートタブをクリックしてください。`);
+        }
+      }
+    } catch (error) {
+      console.error('シートの切り替えに失敗しました:', error);
+      // フォールバック: クリップボードにコピー
       navigator.clipboard.writeText(`シート名: ${sheet.name}, ID: ${sheet.id}`);
-      alert(`シート情報をクリップボードにコピーしました:\n${sheet.name} (${sheet.id})`);
+      alert(`シート情報をクリップボードにコピーしました:\n${sheet.name} (ID: ${sheet.id})`);
     }
   };
 
