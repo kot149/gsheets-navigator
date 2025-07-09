@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { SheetInfo } from '../types';
 import { SearchInput } from './SearchInput';
 import { SheetList } from './SheetList';
