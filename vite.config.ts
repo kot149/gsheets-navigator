@@ -11,9 +11,10 @@ export default defineConfig({
     monkey({
       entry: 'src/main.tsx',
       userscript: {
-        icon: 'https://vitejs.dev/logo.svg',
-        namespace: 'npm/vite-plugin-monkey',
-        match: [ 'https://docs.google.com/spreadsheets/d/*', 'https://www.google.com/*' ],
+        author: "https://github.com/kot149",
+        homepageURL: "https://github.com/kot149/gsheets-navigator",
+        downloadURL: "https://github.com/kot149/gsheets-navigator/releases/download/latest/gsheets-navigator.user.js",
+        match: [ 'https://docs.google.com/spreadsheets/d/*' ],
       },
       build: {
         externalGlobals: {
