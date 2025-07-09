@@ -30,6 +30,7 @@ function App() {
 
   const handleSheetClick = (sheet: SheetInfo) => {
     navigateToSheet(sheet);
+    closeDialog();
   };
 
   const { selectedIndex, resetSelectedIndex } = useKeyboardNavigation({
