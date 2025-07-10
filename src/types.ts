@@ -1,4 +1,4 @@
 export interface SheetInfo {
-  id: string;
+  index: number;
   name: string;
 }

@@ -3,11 +3,10 @@ import { SheetNavigatorDialog } from './components/SheetNavigatorDialog';
 import { useSheetExtraction } from './hooks/useSheetExtraction';
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import { useDialog } from './hooks/useDialog';
-import { navigateToSheet } from './utils/sheetUtils';
 import { SheetInfo } from './types';
 
 function App() {
-  const { sheets, isScanning, scanPage } = useSheetExtraction();
+  const { sheets, isScanning, scanPage, navigateToSheet } = useSheetExtraction();
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const filteredSheets = sheets.filter(sheet =>
@@ -28,9 +27,13 @@ function App() {
     handleDialogMouseUp
   } = useDialog(handleDialogOpen);
 
-  const handleSheetClick = (sheet: SheetInfo) => {
-    navigateToSheet(sheet);
-    closeDialog();
+  const handleSheetClick = async (sheet: SheetInfo) => {
+    const success = await navigateToSheet(sheet.name);
+    if (success) {
+      closeDialog();
+    } else {
+      console.error('Failed to navigate to sheet:', sheet.name);
+    }
   };
 
   const { selectedIndex, resetSelectedIndex } = useKeyboardNavigation({

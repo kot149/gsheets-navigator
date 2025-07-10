@@ -21,7 +21,7 @@ export const SheetList = ({ sheets, selectedIndex, onSheetClick }: SheetListProp
     <div className="space-y-2 max-h-60 overflow-y-auto">
       {sheets.map((sheet, index) => (
         <div
-          key={sheet.id}
+          key={sheet.index}
           onClick={() => onSheetClick(sheet)}
           className={`flex items-center justify-between p-2 rounded border-2 cursor-pointer transition-colors duration-200 ${
             index === selectedIndex
