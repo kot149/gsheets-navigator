@@ -2,7 +2,7 @@
 
 A UserScript to add the feature to search and jump sheets in Google Sheets.
 
-![image](https://github.com/user-attachments/assets/e35cebd9-bd34-4455-ba20-e05ace19903f)
+![image](https://github.com/user-attachments/assets/e0bcf014-ff90-4849-a9c0-d2ca7e5a93e6)
 
 ## Installation
 
