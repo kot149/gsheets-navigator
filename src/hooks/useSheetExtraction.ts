@@ -12,7 +12,7 @@ export const useSheetExtraction = () => {
       const tabNameElem = tab.querySelector(".docs-sheet-tab-name");
 
       if (tabNameElem) {
-        const name = tabNameElem.textContent?.trim() || '';
+        const name = tabNameElem.textContent || 'Unknown';
 
         extractedSheets.push({
           index: index,
@@ -26,7 +26,7 @@ export const useSheetExtraction = () => {
 
   const navigateToSheet = useCallback(async (sheetName: string) => {
     const tabNameElem = [...document.querySelectorAll(".docs-sheet-tab-name")]
-      .find(elem => elem.textContent?.trim() === sheetName);
+      .find(elem => elem.textContent === sheetName);
 
     if (tabNameElem) {
       const tabElem = tabNameElem.closest(".docs-sheet-tab");
