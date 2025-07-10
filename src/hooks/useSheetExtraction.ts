@@ -56,34 +56,10 @@ export const useSheetExtraction = () => {
   }, []);
 
   const scanPage = useCallback(async () => {
-
     try {
-      const tryExtract = (): boolean => {
-        const extractedSheets = extractSheetsFromDOM();
-
-        if (extractedSheets.length === 0) return false;
-
-        setSheets(extractedSheets);
-        console.log('extractedSheets', extractedSheets);
-        return true;
-      };
-
-      let success = tryExtract();
-
-      if (!success) {
-        const maxAttempts = 10;
-        let attempts = 0;
-
-        const interval = setInterval(() => {
-          attempts++;
-          success = tryExtract();
-
-          if (success || attempts >= maxAttempts) {
-            clearInterval(interval);
-          }
-        }, 300);
-      }
-
+      const extractedSheets = extractSheetsFromDOM();
+      setSheets(extractedSheets);
+      console.log('extractedSheets', extractedSheets);
     } catch (error) {
       console.error('Error scanning page:', error);
     }
