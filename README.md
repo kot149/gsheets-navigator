@@ -1,6 +1,6 @@
 # Sheets Navigator for Google Sheets
 
-A UserScript to add the feature to search and jump sheets in Google Sheets.
+A UserScript to add the feature to search and jump sheets in Google Sheets without touching the mouse.
 
 ![image](https://github.com/user-attachments/assets/e0bcf014-ff90-4849-a9c0-d2ca7e5a93e6)
 
@@ -15,7 +15,7 @@ A UserScript to add the feature to search and jump sheets in Google Sheets.
 
 1. Open any Google Sheets document
 2. Press `Ctrl + Space` to open the navigator
-3. Type to search or use arrow keys to navigate
+3. Type to search and use arrow keys to select a sheet
 4. Press `Enter` to switch sheets or `Escape` to close
 
 ## Development
