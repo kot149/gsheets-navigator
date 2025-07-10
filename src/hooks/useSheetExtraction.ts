@@ -3,7 +3,6 @@ import { SheetInfo } from '../types';
 
 export const useSheetExtraction = () => {
   const [sheets, setSheets] = useState<SheetInfo[]>([]);
-  const [isScanning, setIsScanning] = useState(false);
 
   const extractSheetsFromDOM = useCallback((): SheetInfo[] => {
     const tabs = document.querySelectorAll(".docs-sheet-tab");
@@ -57,7 +56,6 @@ export const useSheetExtraction = () => {
   }, []);
 
   const scanPage = useCallback(async () => {
-    setIsScanning(true);
 
     try {
       const tryExtract = (): boolean => {
@@ -86,8 +84,8 @@ export const useSheetExtraction = () => {
         }, 300);
       }
 
-    } finally {
-      setIsScanning(false);
+    } catch (error) {
+      console.error('Error scanning page:', error);
     }
   }, [extractSheetsFromDOM]);
 
@@ -111,7 +109,6 @@ export const useSheetExtraction = () => {
 
   return {
     sheets,
-    isScanning,
     scanPage,
     navigateToSheet
   };

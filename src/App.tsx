@@ -6,7 +6,7 @@ import { useDialog } from './hooks/useDialog';
 import { SheetInfo } from './types';
 
 function App() {
-  const { sheets, isScanning, scanPage, navigateToSheet } = useSheetExtraction();
+  const {sheets, scanPage, navigateToSheet} = useSheetExtraction();
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const filteredSheets = sheets.filter(sheet =>
@@ -58,11 +58,8 @@ function App() {
         isOpen={isDialogOpen}
         sheets={filteredSheets}
         allSheets={sheets}
-        isScanning={isScanning}
         selectedIndex={selectedIndex}
         searchKeyword={searchKeyword}
-        onClose={closeDialog}
-        onRescan={scanPage}
         onSheetClick={handleSheetClick}
         onSearchChange={handleSearchChange}
         onBackgroundClick={handleDialogBackgroundClick}
