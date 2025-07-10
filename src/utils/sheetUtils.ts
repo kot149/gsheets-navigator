@@ -14,7 +14,7 @@ export const extractSheetsFromCurrentPage = (): SheetInfo[] => {
       while ((match1 = pattern1.exec(text)) !== null) {
         const gid = match1[2];
         const name = match1[3];
-        if (gid && name && gid !== '0') {
+        if (gid && name) {
           extractedSheets.push({ id: gid, name });
         }
       }
@@ -24,7 +24,7 @@ export const extractSheetsFromCurrentPage = (): SheetInfo[] => {
       while ((match2 = pattern2.exec(text)) !== null) {
         const gid = match2[1];
         const name = match2[2];
-        if (gid && name && gid !== '0' && name.length > 0) {
+        if (gid && name && name.length > 0) {
           const existing = extractedSheets.find(s => s.id === gid);
           if (!existing) {
             extractedSheets.push({ id: gid, name });
@@ -36,7 +36,7 @@ export const extractSheetsFromCurrentPage = (): SheetInfo[] => {
       if (gridIdMatch) {
         const currentGid = gridIdMatch[1];
         const activeTab = document.querySelector('.docs-sheet-active-tab .docs-sheet-tab-name');
-        if (activeTab && currentGid !== '0') {
+        if (activeTab) {
           const activeName = activeTab.textContent?.trim();
           if (activeName) {
             const existing = extractedSheets.find(s => s.id === currentGid);
