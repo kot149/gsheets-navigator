@@ -43,7 +43,7 @@ export const useDialog = (onOpenDialog?: () => void) => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.code === 'Space') {
+      if (event.ctrlKey && event.code === 'KeyS') {
         event.preventDefault();
         openDialog();
       }

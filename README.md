@@ -14,7 +14,7 @@ A UserScript to add the feature to search and jump sheets in Google Sheets witho
 ## Usage
 
 1. Open any Google Sheets document
-2. Press `Ctrl + Space` to open the navigator
+2. Press `Ctrl + S` (or `Cmd + S` on Mac) to open the navigator
 3. Type to search and use arrow keys to select a sheet
 4. Press `Enter` to switch sheets or `Escape` to close
 
