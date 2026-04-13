@@ -31,8 +31,6 @@ export const useSheetExtraction = () => {
     if (tabNameElem) {
       const tabElem = tabNameElem.closest(".docs-sheet-tab");
       if (tabElem) {
-        console.log(`✅ Navigating to sheet: ${sheetName}`);
-
         const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
         tabElem.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
@@ -59,7 +57,6 @@ export const useSheetExtraction = () => {
     try {
       const extractedSheets = extractSheetsFromDOM();
       setSheets(extractedSheets);
-      console.log('extractedSheets', extractedSheets);
     } catch (error) {
       console.error('Error scanning page:', error);
     }
