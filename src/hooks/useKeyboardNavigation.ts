@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SheetInfo } from '../types';
 
 interface UseKeyboardNavigationProps {
@@ -8,6 +8,14 @@ interface UseKeyboardNavigationProps {
   onCloseDialog: () => void;
 }
 
+function isIMEHandlingKeyEvent(event: KeyboardEvent): boolean {
+  return (
+    event.isComposing ||
+    event.key === 'Process' ||
+    event.keyCode === 229
+  );
+}
+
 export const useKeyboardNavigation = ({
   isDialogOpen,
   filteredSheets,
@@ -15,9 +23,14 @@ export const useKeyboardNavigation = ({
   onCloseDialog
 }: UseKeyboardNavigationProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const suppressNextKeyFromIMECommitRef = useRef(false);
 
   const handleKeyNavigation = (event: KeyboardEvent) => {
     if (!isDialogOpen) return;
+
+    if (isIMEHandlingKeyEvent(event)) {
+      return;
+    }
 
     if (event.key === 'ArrowDown') {
       event.preventDefault();
@@ -26,6 +39,10 @@ export const useKeyboardNavigation = ({
       event.preventDefault();
       setSelectedIndex(prev => Math.max(prev - 1, 0));
     } else if (event.key === 'Enter') {
+      if (suppressNextKeyFromIMECommitRef.current) {
+        suppressNextKeyFromIMECommitRef.current = false;
+        return;
+      }
       event.preventDefault();
       if (filteredSheets[selectedIndex]) {
         onSelectSheet(filteredSheets[selectedIndex]);
@@ -34,16 +51,25 @@ export const useKeyboardNavigation = ({
   };
 
   const handleEscapeKey = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      onCloseDialog();
-    }
+    if (event.key !== 'Escape') return;
+    if (isIMEHandlingKeyEvent(event)) return;
+    onCloseDialog();
   };
 
   useEffect(() => {
+    const onCompositionEnd = () => {
+      suppressNextKeyFromIMECommitRef.current = true;
+      queueMicrotask(() => {
+        suppressNextKeyFromIMECommitRef.current = false;
+      });
+    };
+
+    window.addEventListener('compositionend', onCompositionEnd);
     window.addEventListener('keydown', handleKeyNavigation);
     window.addEventListener('keydown', handleEscapeKey);
 
     return () => {
+      window.removeEventListener('compositionend', onCompositionEnd);
       window.removeEventListener('keydown', handleKeyNavigation);
       window.removeEventListener('keydown', handleEscapeKey);
     };
