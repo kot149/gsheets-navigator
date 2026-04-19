@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { SheetInfo } from '../types';
 
 interface SheetListProps {
@@ -7,6 +8,15 @@ interface SheetListProps {
 }
 
 export const SheetList = ({ sheets, selectedIndex, onSheetClick }: SheetListProps) => {
+  const selectedRowRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    selectedRowRef.current?.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest'
+    });
+  }, [selectedIndex]);
+
   if (sheets.length === 0) {
     return (
       <div className="text-center py-8">
@@ -22,6 +32,7 @@ export const SheetList = ({ sheets, selectedIndex, onSheetClick }: SheetListProp
       {sheets.map((sheet, index) => (
         <div
           key={sheet.index}
+          ref={index === selectedIndex ? selectedRowRef : undefined}
           onClick={() => onSheetClick(sheet)}
           className={`flex items-center justify-between p-2 rounded border-2 cursor-pointer transition-colors duration-200 ${
             index === selectedIndex
