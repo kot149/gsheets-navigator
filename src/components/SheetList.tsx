@@ -34,10 +34,10 @@ export const SheetList = ({ sheets, selectedIndex, onSheetClick }: SheetListProp
           key={sheet.index}
           ref={index === selectedIndex ? selectedRowRef : undefined}
           onClick={() => onSheetClick(sheet)}
-          className={`flex items-center justify-between p-2 rounded border-2 cursor-pointer transition-colors duration-200 ${
+          className={`flex items-center justify-between p-2 rounded border-2 cursor-pointer ${
             index === selectedIndex
               ? 'bg-blue-100 dark:bg-blue-900/50 border-blue-500'
-              : 'bg-gray-50 dark:bg-gray-700 border-transparent hover:bg-gray-100 dark:hover:bg-gray-600'
+              : 'bg-gray-50 dark:bg-gray-700 border-transparent hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-50'
           }`}
         >
           <div className="flex items-center space-x-3">
