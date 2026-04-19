@@ -41,18 +41,20 @@ export const SheetNavigatorDialog = ({
       onClick={onBackgroundClick}
     >
       <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6 max-h-[80vh] overflow-auto space-y-4"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col overflow-hidden p-6"
         onClick={(e) => e.stopPropagation()}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
-        <SearchInput
-          value={searchKeyword}
-          onChange={onSearchChange}
-        />
+        <div className="shrink-0">
+          <SearchInput
+            value={searchKeyword}
+            onChange={onSearchChange}
+          />
+        </div>
 
-        <div>
+        <div className="flex-1 min-h-0 overflow-y-auto mt-4">
           {sheets.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-500 dark:text-gray-400">

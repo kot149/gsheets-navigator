@@ -28,7 +28,7 @@ export const SheetList = ({ sheets, selectedIndex, onSheetClick }: SheetListProp
   }
 
   return (
-    <div className="space-y-2 overflow-y-auto">
+    <div className="space-y-2">
       {sheets.map((sheet, index) => (
         <div
           key={sheet.index}
