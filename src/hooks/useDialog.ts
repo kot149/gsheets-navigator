@@ -43,7 +43,11 @@ export const useDialog = (onOpenDialog?: () => void) => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.code === 'KeyS') {
+      const modifierKey = /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+        ? event.metaKey
+        : event.ctrlKey;
+
+      if (modifierKey && event.code === 'KeyS') {
         event.preventDefault();
         openDialog();
       }
